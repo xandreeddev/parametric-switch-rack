@@ -46,11 +46,11 @@
             "coupon_vary": "tolerance",
             "coupon_step": "0.1"
         },
-        "Test - keystone coupon (latch plate thickness)": {
+        "Test - keystone coupon (snap frame depth)": {
             "output": "keystone_coupon",
-            "coupon_variants": "5",
-            "coupon_vary": "plate",
-            "coupon_step": "0.2"
+            "coupon_variants": "3",
+            "coupon_vary": "depth",
+            "coupon_step": "0.3"
         },
         "Test - switch clearance ring": {
             "output": "switch_test",
@@ -63,6 +63,15 @@
         "Accessories - 2 blank coupler covers": {
             "output": "accessories",
             "blank_plugs": "2"
+        },
+        "1U - hearts, multicolor with backing": {
+            "output": "mount",
+            "rack_units": "1",
+            "mesh_pattern": "hearts",
+            "multicolor": "true",
+            "back_plate": "true",
+            "keystones_left": "1",
+            "keystones_right": "1"
         }
     }
 }
