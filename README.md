@@ -110,6 +110,8 @@ The enclosure, gussets, bracket bosses and coupler holders are all checked again
 
 ## Printing (Bambu Lab X1 Carbon, PETG)
 
+![print orientation](images/print.png)
+
 - **Orientation:** as exported, front face down on the plate. No supports anywhere. The enclosure, coupler holders and cradles stand up from the faceplate. The only overhangs are the 1.5 mm switch-clip hooks, the 1 mm hook grooves and the 45° chamfers.
 - **Bed:** a 254 mm panel uses almost the whole 256 mm plate. Centre it front to back (clear of the front-left first-layer-inspection zone) and skip the brim. On a smaller bed, `split_panel` cuts the panel into two halves with a glued dovetail joint.
 - **Suggested profile:** 0.2 mm layers, 4 walls, 20–25 % gyroid infill, PETG, textured PEI. Check that the filament preset is PETG: MakerWorld downloads can arrive set to PLA.
