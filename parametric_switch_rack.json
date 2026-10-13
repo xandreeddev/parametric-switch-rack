@@ -1,0 +1,68 @@
+{
+    "fileFormatVersion": "1",
+    "parameterSets": {
+        "1U - switch + 1 coupler, snap clips (default)": {
+            "output": "mount",
+            "rack_units": "1",
+            "switch_width": "100",
+            "switch_height": "28",
+            "switch_depth": "100",
+            "switch_loading": "rear",
+            "retention": "clips",
+            "keystone_preset": "goobay_90866",
+            "keystones_left": "1",
+            "keystones_right": "0"
+        },
+        "1U - front loading, friction + rear stop (reference style)": {
+            "output": "mount",
+            "rack_units": "1",
+            "switch_loading": "front",
+            "switch_recess": "0",
+            "retention": "friction",
+            "rear_stop": "true",
+            "keystones_left": "1",
+            "keystones_right": "1"
+        },
+        "1U - screw-on rear brackets": {
+            "output": "mount",
+            "rack_units": "1",
+            "switch_loading": "rear",
+            "retention": "screw",
+            "keystones_left": "1",
+            "keystones_right": "1"
+        },
+        "2U - 2x2 couplers each side, diamond mesh": {
+            "output": "mount",
+            "rack_units": "2",
+            "switch_height": "40",
+            "keystones_left": "4",
+            "keystones_right": "4",
+            "keystone_rows": "2",
+            "mesh_pattern": "diamond"
+        },
+        "Test - keystone coupon (fit tolerance)": {
+            "output": "keystone_coupon",
+            "coupon_variants": "3",
+            "coupon_vary": "tolerance",
+            "coupon_step": "0.1"
+        },
+        "Test - keystone coupon (latch plate thickness)": {
+            "output": "keystone_coupon",
+            "coupon_variants": "5",
+            "coupon_vary": "plate",
+            "coupon_step": "0.2"
+        },
+        "Test - switch clearance ring": {
+            "output": "switch_test",
+            "switch_test_style": "ring",
+            "switch_test_depth": "12"
+        },
+        "Test - rack hole alignment": {
+            "output": "rack_test"
+        },
+        "Accessories - 2 blank coupler covers": {
+            "output": "accessories",
+            "blank_plugs": "2"
+        }
+    }
+}

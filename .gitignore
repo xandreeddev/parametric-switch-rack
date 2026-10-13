@@ -1,0 +1,6 @@
+# working notes and local renders
+PROMPT.md
+*.stl
+!exports/*.stl
+/scratch/
+.DS_Store
