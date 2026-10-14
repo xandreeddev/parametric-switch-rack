@@ -12,7 +12,7 @@ The customizer opens with five groups. Most people never need anything else:
 |---|---|---|
 | 1 | **Panel size** | `rack_units`: 1U, 2U … 6U |
 | 2 | **Switch size** | `switch_width`, `switch_height`, `switch_depth`, measured with calipers |
-| 3 | **RJ45 couplers** | how many `keystones_left` / `keystones_right` (0 = none), and the coupler model (Goobay 90866 by default) |
+| 3 | **RJ45 couplers** | how many `keystones_left` / `keystones_right` (0 = none), and the coupler model (Goobay 96100 by default) |
 | 4 | **Pattern** | one of 15 patterns, or solid |
 | 5 | **What to print** | the full mount, or a test piece |
 
@@ -23,23 +23,34 @@ The ventilated enclosure around the switch (the "shelf all around") sizes itself
 | ![rear](images/rear.png) | ![2U, 4+4 couplers, diamond pattern](images/2u_diamond.png) |
 | Snap clips hold the switch from behind; patterned top and shelf | 2U, 2×2 couplers each side, diamond pattern |
 | ![coupler holders from behind](images/rear_ks.png) | ![multicolor hearts with backing](images/multicolor.png) |
-| Coupler holders: snap frame + support cradle | Multicolor: frame, pattern and backing colours |
+| Coupler holders from behind: tunnel, latch and hook windows, cradle | Multicolor: frame, pattern and backing colours |
 
 ## How the RJ45 couplers clip in
 
 ![side section of a coupler in its holder](images/keystone_section.png)
 
-Keystone modules (the Goobay 90866 Cat6A coupler included) are built to snap into a **frame about 8 mm deep**. The Goobay datasheet gives 8.1 mm from the front face to the bottom hook. Each coupler position therefore gets a holder, not just a hole:
+Keystone couplers like the Goobay 96100 and 90866 are made to clip into metal keystone holders (such as the Goobay 79883) **from behind**. Each coupler position on the panel copies that holder:
 
-- **Snap frame:** a tunnel the exact size of the keystone opening (14.9 × 17.0 mm + `keystone_tolerance`), running from the panel front to 7.8 mm deep. Push the coupler straight in. The spring latch on top is pressed down inside the tunnel and **pops up behind the frame's rear edge**. The fixed hook underneath drops in behind the bottom edge, into a groove. The coupler face ends up flush with the panel.
-- **Support cradle:** behind the frame, a U-shaped channel (floor and side walls, 12 mm long) carries the coupler body so it can't sag or twist when cables are plugged in. The top stays open so you can reach the latch.
-- **To remove:** press the latch down from behind the panel and pull the coupler out the front.
+- **Tunnel:** 9.8 mm deep from the panel front. Inside it is the metal holder's 14.7 × 19.2 mm opening plus `keystone_tolerance` on every side: 15.0 × 19.5 mm for the 96100.
+- **Windows and catch lip:** the latch wall and the hook wall each have a window. The coupler's spring latch (top) and fixed hook (bottom) drop into these windows. The back face of each then catches on the 1.5 mm lip behind its window. The datasheets put both catch faces 8.1 mm behind the coupler's front face, so the lip starts at 8.3 mm and the coupler face ends up flush with the panel.
+- **Side stops:** the bumps (96100) or springs (90866) on the coupler's sides rest against the tunnel's rear end, so it can't slide forward.
+- **Front lip:** at the face, the opening is only just taller than the coupler body, so it can't be pushed out through the front either.
+- **Cradle:** behind the tunnel, two L-shaped rails carry the coupler body for another 12 mm. The gap between them lets the hook slide through to its window. The top stays open so you can reach the latch.
 
-"Keystone" is a de-facto standard. The opening is the same across brands, but the exact catch depth varies slightly between manufacturers. So print the **keystone coupon** (`output = keystone_coupon`) first. It has three holders at frame depths **7.5 / 7.8 / 8.1 mm**, engraved on the back. Use the depth where the coupler clicks in firmly with no play (`keystone_catch_override`). A second coupon preset steps the opening tolerance instead.
+**To fit a coupler:** from behind the panel, push it in front first, latch on top, until it clicks. That's easiest before the panel goes into the rack. **To remove it:** press the latch down just behind the tunnel and lift the back of the coupler slightly so the hook clears its window. Then pull it out backwards.
+
+Print the **keystone coupon** (`output = keystone_coupon`) first. It has three holders with the catch lip at **8.1 / 8.3 / 8.5 mm**, engraved on the back. Pick the depth where the coupler clicks in with the least play and set it as `keystone_catch_override`. A second coupon preset steps the tunnel tolerance instead, for a fit that is too tight or too loose.
 
 ![keystone coupon](images/coupon.png)
 
-Presets: `goobay_90866` (from the manufacturer drawing: body 14.7 × 16.2 mm, 19.7 mm including the latch, 33.2 mm long; EAN 4040849908668), `generic_stp` and `generic_utp` (nominal values; verify them with the coupon), and `custom` (every dimension exposed). For thin patch-panel-style modules that catch right behind the face, set the catch depth to about 2 mm. Rows, spacing, latch direction, and placement next to the switch or out by the rack ears are under *Advanced: RJ45 couplers*. Unused holders take the snap-in blank covers from `output = accessories`.
+Presets:
+
+- `goobay_96100` (default, from the manufacturer drawing): body 14.5 × 16.1 mm, 33 mm long, catch 8.1 ± 0.1 mm, 16.5 mm wide over the side stops.
+- `goobay_90866`: body 14.7 × 16.2 mm, 33.2 mm long, catch 8.1 ± 0.2 mm, EAN 4040849908668.
+- `generic`: other modules made for the 19.2 × 14.9 keystone port. These are nominal values; check them with the coupon.
+- `custom`: every dimension exposed.
+
+Rows, spacing, latch direction, and placement next to the switch or out by the rack ears are under *Advanced: RJ45 couplers*. Unused holders take the snap-in blank covers from `output = accessories`. They push in from the front and click into the hook window.
 
 ## Patterns
 
@@ -103,7 +114,7 @@ The enclosure, gussets, bracket bosses and coupler holders are all checked again
 
 ## Print the test pieces first
 
-1. **Keystone coupon:** find the snap depth that clicks firmly.
+1. **Keystone coupon:** find the catch-lip depth where your coupler clicks in with the least play.
 2. **Rack alignment frame** (`rack_test`): screw it to the rack to check hole spacing and rail clearance.
 3. **Switch clearance ring** (`switch_test`): slide the switch in to check clearance and bezel overlap.
 4. **Complete mount.**
@@ -112,7 +123,7 @@ The enclosure, gussets, bracket bosses and coupler holders are all checked again
 
 ![print orientation](images/print.png)
 
-- **Orientation:** as exported, front face down on the plate. No supports anywhere. The enclosure, coupler holders and cradles stand up from the faceplate. The only overhangs are the 1.5 mm switch-clip hooks, the 1 mm hook grooves and the 45° chamfers.
+- **Orientation:** as exported, front face down on the plate. No supports anywhere. The enclosure, coupler holders and cradles stand up from the faceplate. The only overhangs are the 1.5 mm switch-clip hooks, the 45° chamfers, and short bridges (12.9 mm at most) over the coupler windows.
 - **Bed:** a 254 mm panel uses almost the whole 256 mm plate. Centre it front to back (clear of the front-left first-layer-inspection zone) and skip the brim. On a smaller bed, `split_panel` cuts the panel into two halves with a glued dovetail joint.
 - **Suggested profile:** 0.2 mm layers, 4 walls, 20–25 % gyroid infill, PETG, textured PEI. Check that the filament preset is PETG: MakerWorld downloads can arrive set to PLA.
 
@@ -141,6 +152,7 @@ The model stops with a message when:
 
 - the enclosure is wider than the rails or taller than the panel (it suggests the rack-unit count that fits)
 - a coupler holder sticks out past the rails or the panel height, or collides with the enclosure or a bracket boss
+- the keystone catch lip is set so shallow that the latch window would run into the front lip
 - the panel is wider than the bed without `split_panel`, or the mount is taller than the print height
 - the bezel would close up, the switch is too shallow for the clip length, or the backing would leave less than 1 mm of pattern
 - an impossible loading/retention combination is chosen, or the split line crosses the switch or a coupler

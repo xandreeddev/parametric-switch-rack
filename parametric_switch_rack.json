@@ -9,7 +9,7 @@
             "switch_depth": "100",
             "switch_loading": "rear",
             "retention": "clips",
-            "keystone_preset": "goobay_90866",
+            "keystone_preset": "goobay_96100",
             "keystones_left": "1",
             "keystones_right": "0"
         },
@@ -46,11 +46,11 @@
             "coupon_vary": "tolerance",
             "coupon_step": "0.1"
         },
-        "Test - keystone coupon (snap frame depth)": {
+        "Test - keystone coupon (catch lip depth)": {
             "output": "keystone_coupon",
             "coupon_variants": "3",
             "coupon_vary": "depth",
-            "coupon_step": "0.3"
+            "coupon_step": "0.2"
         },
         "Test - switch clearance ring": {
             "output": "switch_test",

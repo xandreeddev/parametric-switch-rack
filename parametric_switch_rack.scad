@@ -8,7 +8,8 @@
 // under "Advanced" has working defaults.
 //
 // - The enclosure ("shelf all around") sizes itself from the switch.
-// - Couplers snap into a ~8 mm keystone frame with a support cradle behind it.
+// - Couplers clip in from behind, into a tunnel shaped like a metal keystone
+//   holder (windows for latch and hook, catch lip), with a cradle behind it.
 // - 15 patterns (the KWS generator set) regenerate around switch and couplers.
 // - Invalid combinations stop with an explanation instead of silently shrinking.
 //
@@ -35,8 +36,8 @@ switch_depth = 100; // [20:0.1:240]
 keystones_left = 1; // [0:1:12]
 // RJ45 couplers to the right of the switch. 0 = none.
 keystones_right = 0; // [0:1:12]
-// Coupler model. Values are nominal: print the keystone test coupon first.
-keystone_preset = "goobay_90866"; // [goobay_90866:Goobay 90866 Cat6A STP coupler, generic_stp:Generic shielded (STP) coupler, generic_utp:Generic keystone jack (UTP), custom:Custom (Advanced: custom coupler)]
+// Coupler model. Couplers clip in from behind the panel. Print the keystone test coupon first.
+keystone_preset = "goobay_96100"; // [goobay_96100:Goobay 96100 Cat6 STP coupler (slim), goobay_90866:Goobay 90866 Cat6A STP coupler, generic:Other keystone module (19.2 x 14.9 port), custom:Custom (Advanced: custom coupler)]
 
 /* [4. Pattern] */
 // Perforation pattern for the faceplate and the switch enclosure.
@@ -163,32 +164,32 @@ keystone_anchor = "switch"; // [switch:Next to the switch, ear:Next to the rack 
 keystone_gap = 6; // [1:0.5:80]
 // Move the coupler groups down (-) or up (+) relative to the switch centre.
 keystone_offset_y = 0; // [-60:0.5:60]
-// Depth of the snap frame: the latch and hook click behind its rear edge. 0 = preset (Goobay 90866: 7.8).
+// Panel front to the catch lip the latch and hook click against. 0 = preset (coupler catch + 0.2: 8.3 for Goobay).
 keystone_catch_override = 0; // [0:0.05:14]
-// Wall thickness of the snap frame and support cradle.
-keystone_wall = 2; // [1.2:0.1:4]
-// Cradle behind the snap frame that supports the coupler body.
+// Wall thickness of the keystone tunnel (at least 1.6: the latch pokes 1.6 mm into its window).
+keystone_wall = 2; // [1.6:0.1:4]
+// Cradle behind the tunnel that carries the coupler body.
 keystone_support = true;
-// Length of the support cradle behind the snap frame.
-keystone_support_length = 12; // [3:0.5:30]
+// Length of the support cradle behind the tunnel.
+keystone_support_length = 12; // [3:0.5:20]
 
 /* [Advanced: custom coupler] */
-// Nominal opening width.
+// Tunnel width (keystone port standard: 14.9). Tolerance is added on top.
 custom_opening_width = 14.9; // [10:0.05:25]
-// Nominal opening height (latch direction).
-custom_opening_height = 17.0; // [10:0.05:25]
-// Body width (preview dummy only).
+// Tunnel height, latch direction (keystone port standard: 19.2).
+custom_opening_height = 19.2; // [10:0.05:25]
+// Body width.
 custom_body_width = 14.7; // [10:0.05:25]
-// Body height without the latch (preview dummy only).
+// Body height without latch and hook. Sets the front lip that keeps the coupler from leaving through the front.
 custom_body_height = 16.2; // [10:0.05:25]
-// Maximum height including the latch.
-custom_max_height = 19.7; // [10:0.05:30]
+// Body plus relaxed latch (preview dummy only).
+custom_max_height = 21.0; // [10:0.05:30]
 // Overall length.
-custom_length = 33.2; // [10:0.1:60]
-// Snap frame depth (front face of the panel to the catch edge). About 2 for thin patch-panel modules.
-custom_catch_depth = 7.8; // [0.8:0.05:14]
-// Distance from the coupler's front face to its latch catch (preview dummy only).
-custom_front_to_catch = 8.1; // [0:0.1:20]
+custom_length = 33.0; // [10:0.1:60]
+// Coupler front face to the catch faces of latch and hook (the vertical back face of each barb).
+custom_front_to_catch = 8.1; // [5:0.05:14]
+// Width over the stops or springs on the coupler's sides (kept clear behind the tunnel). = body width if none.
+custom_stop_width = 16.5; // [10:0.05:25]
 
 /* [Advanced: pattern] */
 // Perforate the faceplate around the switch and couplers.
@@ -270,9 +271,9 @@ split_clearance = 0.15; // [0:0.05:0.5]
 // Keystone coupon: number of holders, each with a different value.
 coupon_variants = 3; // [1:1:5]
 // Keystone coupon: which value steps between holders.
-coupon_vary = "depth"; // [depth:Snap frame depth, tolerance:Fit tolerance]
+coupon_vary = "depth"; // [depth:Catch lip depth, tolerance:Fit tolerance]
 // Keystone coupon: step between holders.
-coupon_step = 0.3; // [0.02:0.01:1]
+coupon_step = 0.2; // [0.02:0.01:1]
 // Switch test: the full outline or a single corner.
 switch_test_style = "ring"; // [ring:Full outline ring, corner:One corner]
 // Switch test: depth of the enclosure section.
@@ -325,82 +326,105 @@ module rect(b) translate([b[0], b[2]]) square([b[1] - b[0], b[3] - b[2]]);
 
 // ============================================================================
 // Keystone presets
-// [opening_w, opening_h, body_w, body_h, max_h, length, catch_depth, front_to_catch]
+// [frame_w, frame_h, body_w, body_h, max_h, length, front_to_catch, stop_w]
 //
-// Keystone modules snap into a frame: the spring latch (top) and a fixed hook
-// (bottom) click in behind the frame's rear edge. catch_depth is that frame
-// depth. front_to_catch is the module's own front-face-to-catch distance, used
-// only to place the preview dummy. The frame is slightly shallower than the
-// catch distance so the latch always has room to spring up.
+// The couplers clip in from behind the panel, front first, like into the metal
+// keystone holders they are made for (e.g. Goobay 79883). Each holder is a
+// tunnel with a window in the latch wall and in the hook wall. The spring latch
+// (top) and the fixed hook (bottom) ramp along the tunnel, drop into the
+// windows and catch on the 1.5 mm lip behind them. The stops on the coupler's
+// sides then rest on the tunnel's rear end, and a lip at the front keeps the
+// coupler from leaving through the face.
+//   frame_w/h       tunnel interior (the 19.2 x 14.9 keystone port); tolerance is added
+//   body_w/h        coupler body without latch and hook
+//   max_h           body plus relaxed latch (preview dummy only)
+//   front_to_catch  coupler front face to the vertical catch faces of latch and hook
+//   stop_w          width over the side stops/springs, kept clear behind the tunnel
 // ============================================================================
 
 function ks_preset(name) =
-  name == "goobay_90866" ? [14.9, 17.0, 14.7, 16.2, 19.7, 33.2, 7.8, 8.1] :  // datasheet: 8.1 ± 0.2 front to hook
-  name == "generic_stp"  ? [14.9, 17.0, 14.8, 16.4, 20.2, 36.0, 7.8, 8.1] :  // nominal
-  name == "generic_utp"  ? [14.9, 16.6, 14.5, 16.0, 19.6, 30.0, 8.8, 9.1] :  // nominal
+  name == "goobay_96100" ? [14.7, 19.2, 14.5, 16.1, 21.1, 33.0, 8.1, 16.5] :  // datasheet: catch 8.1 ± 0.1
+  name == "goobay_90866" ? [14.9, 19.2, 14.7, 16.2, 21.2, 33.2, 8.1, 17.4] :  // datasheet: catch 8.1 ± 0.2
+  name == "generic"      ? [14.9, 19.2, 14.7, 16.2, 21.0, 33.0, 8.1, 14.9] :  // nominal
   [custom_opening_width, custom_opening_height, custom_body_width, custom_body_height,
-   custom_max_height, custom_length, custom_catch_depth, custom_front_to_catch];
+   custom_max_height, custom_length, custom_front_to_catch, custom_stop_width];
 
 KS = ks_preset(keystone_preset);
-KS_D = keystone_catch_override > 0 ? keystone_catch_override : KS[6];
 KS_TOL = keystone_tolerance;
 KS_W = keystone_wall;
-KS_RS = 0.5;   // pocket margin beside the body (thin-frame case only)
-KS_RB = 1.5;   // pocket margin below the opening for the fixed hook
-KS_RT = 1.0;   // clearance above the latch tip
-KS_GROOVE = [1.0, 3.0];   // hook groove in the cradle floor: depth, length
-KS_SUP_L = min(keystone_support_length, KS[5] - KS[7] - 1);
+KS_PLAY = 0.2;    // the catch lip sits this far behind the coupler's catch faces
+KS_LIP = 1.5;     // catch lip behind the windows: the 1.5 mm sheet these modules clip into
+KS_WIN = 3.3;     // window length along the tunnel
+KS_FLAT = 0.6;    // straight part of the front lip before its 45 degree ramp
+KS_CHAMF = 0.6;   // lead-in at the tunnel's rear entry (latch and hook walls)
+KS_RAIL_H = 4;    // cradle rails, above the floor
+KS_D = keystone_catch_override > 0 ? keystone_catch_override : KS[6] + KS_PLAY;   // panel front to catch lip
+KS_SUP_L = keystone_support ? max(0, min(keystone_support_length, KS[5] - KS[6] - KS_LIP - 3)) : 0;
 KS_ROT = keystone_orientation == "down" ? 180 : keystone_orientation == "left" ? 90 :
          keystone_orientation == "right" ? -90 : 0;
 KS_SIDEWAYS = keystone_orientation == "left" || keystone_orientation == "right";
 
-// [aperture_w, aperture_h, footprint_w, footprint_h, footprint_centre_y], aperture-centred, latch up.
-// The footprint covers the frame walls, the cradle floor and the latch's travel above the opening.
-function ks_dims(tol) =
-  let(aw = KS[0] + 2 * tol, ah = KS[1] + 2 * tol,
-      y0 = -ah / 2 - max(KS_W, KS_RB), y1 = max(ah / 2 + KS_W, -ah / 2 + KS[4] + KS_RT))
-  [aw, ah, aw + 2 * KS_W, y1 - y0, (y0 + y1) / 2];
+// Holder geometry for a tolerance and catch-lip depth, aperture-centred, latch up (+Y):
+// [iw, ih, footprint_w, footprint_h, tunnel_depth, window_front, front_opening_top, lip_end,
+//  latch_window_w, rail_x, rail_t, hook_window_w]
+function ks_geo(tol, dc) =
+  let(iw = KS[0] + 2 * tol, ih = KS[1] + 2 * tol,
+      yf = min(ih / 2, -ih / 2 + KS[3] + 2 * tol + 0.25),
+      rail_x = max(iw / 2, KS[7] / 2 + 0.3),
+      rail_t = max(1.2, iw / 2 + KS_W - rail_x))
+  [iw, ih, max(iw + 2 * KS_W, 2 * (rail_x + rail_t)), ih + 2 * KS_W,
+   dc + KS_LIP, dc - KS_WIN, yf, KS_FLAT + ih / 2 - yf, min(12.9, iw - 1), rail_x, rail_t, min(10.5, iw - 1)];
 
-KD = ks_dims(KS_TOL);
-KCW = KS_SIDEWAYS ? KD[3] : KD[2];   // holder footprint on the faceplate
-KCH = KS_SIDEWAYS ? KD[2] : KD[3];
+KG = ks_geo(KS_TOL, KS_D);
+KS_END = KG[4] + KS_SUP_L;           // rear end of holder and cradle
+KCW = KS_SIDEWAYS ? KG[3] : KG[2];   // holder footprint on the faceplate
+KCH = KS_SIDEWAYS ? KG[2] : KG[3];
 
-// Cut through the faceplate, centred on the footprint: the snap opening in front of the
-// catch edge, and a relief pocket behind it (only reached when the frame is thinner than the panel).
-module ks_cut_2d(tol, front) {
-  d = ks_dims(tol);
-  translate([0, -d[4]]) {
-    if (front) square([d[0], d[1]], center = true);
-    else translate([-(d[0] / 2 + KS_RS), -d[1] / 2 - KS_RB]) square([d[0] + 2 * KS_RS, KS[4] + KS_RT + KS_RB]);
-  }
+// Hole in the faceplate for the tunnel. The holder supplies everything inside it.
+module ks_cut_2d(tol) {
+  square([KS[0] + 2 * tol + 2 * KS_W, KS[1] + 2 * tol + 2 * KS_W], center = true);
 }
 
-// Snap frame continued behind the faceplate, plus the support cradle. Footprint-centred, latch up.
-module ks_holder_3d(tol, depth) {
-  d = ks_dims(tol);
-  aw = d[0];
-  ah = d[1];
-  translate([0, -d[4], 0]) {
-    if (depth > T)   // frame tube from the back of the panel to the catch edge
-      translate([0, 0, T - EPS]) linear_extrude(depth - T + EPS) difference() {
-        square([aw + 2 * KS_W, ah + 2 * KS_W], center = true);
-        square([aw, ah], center = true);
-      }
-    if (keystone_support && KS_SUP_L > 0) {
-      z0 = max(depth, T);
-      len_s = depth + KS_SUP_L - z0;
-      difference() {
-        union() {
-          // floor at the opening's bottom edge, so the body rests on it
-          translate([-aw / 2 - KS_W, -ah / 2 - KS_W, z0 - EPS]) cube([aw + 2 * KS_W, KS_W, len_s + EPS]);
-          // side walls up to the opening's top edge: the latch stays free to press
-          for (sx = [-1, 1]) translate([sx > 0 ? aw / 2 : -aw / 2 - KS_W, -ah / 2 - KS_W, z0 - EPS])
-            cube([KS_W, ah + KS_W, len_s + EPS]);
-        }
-        // groove where the fixed hook drops in behind the frame
-        translate([-aw / 2, -ah / 2 - KS_GROOVE[0], depth - EPS]) cube([aw, KS_GROOVE[0] + EPS, KS_GROOVE[1]]);
-      }
+// Tunnel from the panel front to the catch lip and past it, plus the support cradle.
+// Prints front-face-down with no supports: the front lip ramps outward, the window
+// tops are 12.9 mm bridges and the rear lead-in widens upward.
+module ks_holder_3d(tol, dc) {
+  g = ks_geo(tol, dc);
+  iw = g[0];
+  ih = g[1];
+  td = g[4];
+  wf = g[5];
+  yf = g[6];
+  lip_end = g[7];
+  ww = g[8];
+  rail_x = g[9];
+  rail_t = g[10];
+  hw = g[11];
+  difference() {
+    linear_extrude(td) square([iw + 2 * KS_W, ih + 2 * KS_W], center = true);
+    // straight tunnel behind the front lip
+    translate([-iw / 2, -ih / 2, lip_end - EPS]) cube([iw, ih, td]);
+    // front lip on the latch side: low opening at the face, then a 45 degree ramp
+    translate([-iw / 2, -ih / 2, -1]) cube([iw, yf + ih / 2, KS_FLAT + 1]);
+    hull() {
+      translate([-iw / 2, -ih / 2, KS_FLAT - EPS]) cube([iw, yf + ih / 2, EPS]);
+      translate([-iw / 2, -ih / 2, lip_end - EPS]) cube([iw, ih, EPS]);
     }
+    // rear lead-in on the latch and hook walls; the side walls stay square for the side stops
+    hull() {
+      translate([-iw / 2, -ih / 2, td - KS_CHAMF]) cube([iw, ih, EPS]);
+      translate([-iw / 2, -ih / 2 - KS_CHAMF, td]) cube([iw, ih + 2 * KS_CHAMF, 1]);
+    }
+    // windows for latch (12.9 wide, as in the metal holders) and hook (its tab is about 8.5 wide);
+    // their rear edge is the catch lip
+    translate([-ww / 2, ih / 2 - EPS, wf]) cube([ww, KS_W + 1 + EPS, dc - wf]);
+    translate([-hw / 2, -ih / 2 - KS_W - 1, wf]) cube([hw, KS_W + 1 + EPS, dc - wf]);
+  }
+  // Cradle: two L rails carry the body's edges. The gap between them lets the
+  // hook slide through to its window; the rails clear the side stops.
+  if (KS_SUP_L > 0) for (s = [-1, 1]) scale([s, 1, 1]) translate([0, 0, td - EPS]) {
+    translate([hw / 2 + 0.3, -ih / 2 - KS_W, 0]) cube([rail_x + rail_t - hw / 2 - 0.3, KS_W, KS_SUP_L + EPS]);
+    translate([rail_x, -ih / 2 - EPS, 0]) cube([rail_t, KS_RAIL_H + EPS, KS_SUP_L + EPS]);
   }
 }
 
@@ -575,8 +599,10 @@ module check_mount() {
     "Not enough wall height for snap clips: increase switch height or use another retention.");
   assert(!BACKING || back_thickness <= T - 1,
     str("back_thickness (", back_thickness, ") must leave at least 1 mm of patterned faceplate (panel_thickness ", T, ")."));
-  assert(N_KS == 0 || KS_D >= 1,
-    str("The keystone snap frame must be at least 1 mm deep (is ", KS_D, ")."));
+  assert(N_KS == 0 || KG[5] >= KG[7] + 0.5,
+    str("The keystone catch lip at ", fmt(KS_D), " mm is too shallow: the latch window would run into the front lip. Use keystone_catch_override = 0 or at least ",
+        fmt(KG[7] + 0.5 + KS_WIN), "."));
+  assert(N_KS == 0 || KS_END <= bed_size, "The keystone holders are taller than the print height.");
   for (p = KS_POS) {
     r = ks_rect(p);
     assert(r[0] >= -XR_IN + MIN_WALL - EPS && r[1] <= XR_IN - MIN_WALL + EPS,
@@ -587,7 +613,7 @@ module check_mount() {
           " mm tall). Reduce keystone_rows/offset, rotate the couplers, or add rack units."));
     assert(!overlaps(r, [EX - OW / 2 - 0.5, EX + OW / 2 + 0.5, EY - OH / 2 - 0.5, EY + OH / 2 + 0.5]),
       str("A keystone at x = ", fmt(p[0]), " mm collides with the switch enclosure. Increase keystone_gap or move the switch."));
-    assert(retention != "screw" || T + KS[5] < Z_END - BOSS_LEN - BOSS_OUT ||
+    assert(retention != "screw" || KS_D - KS_PLAY - KS[6] + KS[5] < Z_END - BOSS_LEN - BOSS_OUT ||
            !overlaps(r, [EX - OW / 2 - BOSS_OUT - 0.5, EX + OW / 2 + BOSS_OUT + 0.5, EY - BOSS / 2, EY + BOSS / 2]),
       str("A keystone body behind the panel would hit a bracket boss. Increase keystone_gap to at least ", fmt(BOSS_OUT + 0.5), " mm."));
   }
@@ -833,7 +859,7 @@ module panel_2d(zm) {
     rrect([PW, PH], panel_corner_radius);
     mount_holes_2d();
     switch_opening_2d(zm);
-    for (p = KS_POS) translate(p) rotate(KS_ROT) ks_cut_2d(KS_TOL, zm < KS_D);
+    for (p = KS_POS) translate(p) rotate(KS_ROT) ks_cut_2d(KS_TOL);
     if (FRONT_MESH && !(BACKING && zm > Z_BACKING)) front_mesh_2d();
   }
 }
@@ -842,7 +868,6 @@ module panel_2d(zm) {
 module panel_3d(part = "all") {
   zs = concat([0, T],
               REAR_LOAD && RECESS > 0 && RECESS < T ? [RECESS] : [],
-              N_KS > 0 && KS_D < T ? [KS_D] : [],
               BACKING ? [Z_BACKING] : []);
   for (s = slabs(zs)) {
     zm = (s[0] + s[1]) / 2;
@@ -1048,10 +1073,13 @@ module half(left) {
 
 module dummies() {
   color("dimgray", 0.5) translate([EX - SW / 2, SY - SH / 2, RECESS]) cube([SW, SH, SD]);
-  for (p = KS_POS) translate(p) rotate(KS_ROT) translate([0, -KD[4], 0]) {
-    z0 = KS_D - KS[7];
-    color("silver", 0.6) translate([-KS[2] / 2, -KD[1] / 2 + KS_TOL, z0]) cube([KS[2], KS[3], KS[5]]);
-    color("white", 0.6) translate([-4, -KD[1] / 2 + KS_TOL + KS[3], z0 + KS[7] - 4]) cube([8, KS[4] - KS[3], 10]);
+  for (p = KS_POS) translate(p) rotate(KS_ROT) {
+    z0 = KS_D - KS_PLAY - KS[6];   // coupler front face, flush with the panel
+    y0 = -KG[1] / 2;               // resting on the tunnel floor
+    color("silver", 0.6) translate([-KS[2] / 2, y0, z0]) cube([KS[2], KS[3], KS[5]]);
+    // relaxed latch: barb in its window, arm running back
+    color("white", 0.6) translate([-5, y0 + KS[3], z0 + KS[6] - 2.6]) cube([10, KS[4] - KS[3], 11]);
+    color("white", 0.6) translate([-4.25, y0 - 1.25, z0 + KS[6] - 1.5]) cube([8.5, 1.25 + EPS, 1.5]);
   }
 }
 
@@ -1107,25 +1135,25 @@ module keystone_coupon() {
   n = coupon_variants;
   vals = [for (i = [0:n - 1]) (coupon_vary == "tolerance" ? KS_TOL : KS_D) + (i - (n - 1) / 2) * coupon_step];
   assert(coupon_vary != "tolerance" || vals[0] >= 0, "Coupon tolerance would go negative: reduce coupon_step or variants.");
-  assert(coupon_vary != "depth" || vals[0] >= 1, "Coupon frame depth would drop below 1 mm: reduce coupon_step or variants.");
+  assert(coupon_vary != "depth" || vals[0] - KS_WIN >= KG[7] + 0.5,
+    "The shallowest coupon catch lip would run into the front lip: reduce coupon_step or variants.");
   kb = max(keystone_border, 3);
-  dmax = ks_dims(coupon_vary == "tolerance" ? vals[n - 1] : KS_TOL);
+  gmax = ks_geo(coupon_vary == "tolerance" ? vals[n - 1] : KS_TOL, KS_D);
   label_h = 7;
-  cw = dmax[2] + 2 * kb;
-  ch = dmax[3] + 2 * kb + label_h;
+  cw = gmax[2] + 2 * kb;
+  ch = gmax[3] + 2 * kb + label_h;
   for (i = [0:n - 1]) {
     tol = coupon_vary == "tolerance" ? vals[i] : KS_TOL;
     depth = coupon_vary == "depth" ? vals[i] : KS_D;
     label = coupon_vary == "tolerance" ? str("t", fmt(tol)) : str("d", fmt(depth));
     translate([(i - (n - 1) / 2) * cw, 0, 0]) {
       difference() {
-        for (s = slabs(concat([0, T], depth < T ? [depth] : []))) translate([0, 0, s[0]]) linear_extrude(s[1] - s[0])
-          difference() {
-            translate([0, -label_h / 2]) square([cw + EPS, ch], center = true);
-            ks_cut_2d(tol, (s[0] + s[1]) / 2 < depth);
-          }
+        linear_extrude(T) difference() {
+          translate([0, -label_h / 2]) square([cw + EPS, ch], center = true);
+          ks_cut_2d(tol);
+        }
         // Engraved on the back (top while printing); pre-mirrored so it reads correctly there.
-        translate([0, -dmax[3] / 2 - kb - label_h / 2 + 0.5, T - 0.6]) linear_extrude(1)
+        translate([0, -gmax[3] / 2 - kb - label_h / 2 + 0.5, T - 0.6]) linear_extrude(1)
           mirror([1, 0]) text(label, size = 3.2, halign = "center", valign = "center");
       }
       ks_holder_3d(tol, depth);
@@ -1133,33 +1161,37 @@ module keystone_coupon() {
   }
 }
 
-// Snap-in cover for an unused opening. Prints cap-down.
+// Snap-in cover for an unused holder, pushed in from the front. Its hook-side wall
+// is a tab rooted at the cap; the bump near its free end clicks into the hook window.
+// Prints cap-down.
 module blank_plug() {
-  d = ks_dims(KS_TOL);
+  iw = KG[0];
+  ih = KG[1];
   cap = 1.2;
-  w = d[0] - 0.4;
-  h = d[1] - 0.4;
-  tw = 1.0;                 // flexing tab thickness
-  L = KS_D + 6;             // tabs hang from the rear ring, free end near the cap
-  bump = 0.5;
-  zc = cap + KS_D + 0.05;    // bumps click in behind the frame, like a coupler
-  linear_extrude(cap) rrect([d[0] + 2.4, d[1] + 2.4], 1);
-  difference() {
-    translate([0, 0, cap - EPS]) linear_extrude(L + EPS) difference() {
-      square([w, h], center = true);
-      square([w - 2 * tw, h - 2 * tw], center = true);
+  oh = KG[6] + ih / 2;        // front opening height (under the front lip)
+  yc = (KG[6] - ih / 2) / 2;  // its centre
+  w = iw - 0.4;
+  h = oh - 0.4;
+  tw = 1.0;                   // tab thickness
+  L = KS_D - 0.3;             // body length behind the cap
+  bump = 0.8;
+  bw = min(KG[11] - 1, w - 2 * tw - 1);
+  zc = cap + KG[5] + 0.15;    // flat face just behind the window's front edge
+  linear_extrude(cap) translate([0, yc]) rrect([iw + 2.4, oh + 2.4], 1);
+  translate([0, yc, 0]) {
+    difference() {
+      translate([0, 0, cap - EPS]) linear_extrude(L + EPS) difference() {
+        square([w, h], center = true);
+        square([w - 2 * tw, h - 2 * tw], center = true);
+      }
+      // slits from the rear end to 1 mm short of the cap free the tab from the side walls
+      for (sx = [-1, 1]) translate([sx * (w / 2 - tw / 2), -(h / 2 - tw - 0.4), cap + 1 + L / 2])
+        cube([tw + 0.2, 0.8, L], center = true);
     }
-    for (sy = [-1, 1]) {
-      // slits between tab and side walls, up to the rear ring
-      for (sx = [-1, 1]) translate([sx * (w / 2 - tw / 2), sy * (h / 2 - tw - 0.4), cap + (L - 1.5) / 2])
-        cube([tw + 0.2, 0.8, L - 1.5], center = true);
-      // gap between the cap and the free end of the tab
-      translate([0, sy * (h / 2 - tw / 2), cap + 0.3]) cube([w + 0.2, tw + 0.2, 0.6 + 2 * EPS], center = true);
-    }
+    // catch bump: flat face toward the cap, ramp toward the free end
+    translate([-bw / 2, 0, 0]) rotate([90, 0, 90]) linear_extrude(bw)
+      polygon([[-(h / 2 - 0.2), zc], [-(h / 2 + bump), zc], [-(h / 2 + bump), zc + 0.6], [-(h / 2 - 0.2), zc + 0.6 + 2 * bump]]);
   }
-  for (sy = [-1, 1])   // catch bumps: flat face toward the cap, ramp toward the rear
-    translate([-(w - 2 * tw - 1) / 2, 0, 0]) rotate([90, 0, 90]) linear_extrude(w - 2 * tw - 1)
-      polygon([[sy * (h / 2 - 0.2), zc], [sy * (h / 2 + bump), zc], [sy * (h / 2 + bump), zc + 0.6], [sy * (h / 2 - 0.2), zc + 0.6 + 2 * bump]]);
 }
 
 module bracket(s) {
@@ -1175,11 +1207,11 @@ module bracket(s) {
 module accessories() {
   has_brackets = retention == "screw" && include_brackets;
   assert(blank_plugs > 0 || has_brackets, "Nothing to generate: set blank_plugs above 0, or retention = screw with include_brackets.");
-  pitch = ks_dims(KS_TOL)[0] + 6;
+  pitch = KG[0] + 6;
   for (i = [0:max(0, blank_plugs - 1)]) if (blank_plugs > 0) translate([(i - (blank_plugs - 1) / 2) * pitch, 0, 0]) blank_plug();
   if (has_brackets) for (s = [-1, 1]) {
     x_mid = s * ((SW / 2 - bracket_overlap) + (EW / 2 + BOSS)) / 2;
-    translate([-x_mid, -(ks_dims(KS_TOL)[1] / 2 + 6) - (BOSS + 4) / 2 - (s > 0 ? 0 : BOSS + 8), 0]) bracket(s);
+    translate([-x_mid, -(KG[1] / 2 + 6) - (BOSS + 4) / 2 - (s > 0 ? 0 : BOSS + 8), 0]) bracket(s);
   }
 }
 
