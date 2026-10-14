@@ -156,6 +156,7 @@ The model stops with a message when:
 - the panel is wider than the bed without `split_panel`, or the mount is taller than the print height
 - the bezel would close up, the switch is too shallow for the clip length, or the backing would leave less than 1 mm of pattern
 - an impossible loading/retention combination is chosen, or the split line crosses the switch or a coupler
+- a dropdown setting has a value the model doesn't know (instead of an unexplained empty result)
 
 It warns (and still builds) about thin pattern walls, wide bezel lips, short screw engagement, stiff clips, friction-only retention, shortened gussets, backing and multicolor.
 

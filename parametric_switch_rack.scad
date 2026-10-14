@@ -37,7 +37,7 @@ keystones_left = 1; // [0:1:12]
 // RJ45 couplers to the right of the switch. 0 = none.
 keystones_right = 0; // [0:1:12]
 // Coupler model. Couplers clip in from behind the panel. Print the keystone test coupon first.
-keystone_preset = "goobay_96100"; // [goobay_96100:Goobay 96100 Cat6 STP coupler (slim), goobay_90866:Goobay 90866 Cat6A STP coupler, generic:Other keystone module (19.2 x 14.9 port), custom:Custom (Advanced: custom coupler)]
+keystone_preset = "goobay_96100"; // [goobay_96100:Goobay 96100 Cat6 STP coupler - slim, goobay_90866:Goobay 90866 Cat6A STP coupler, generic:Other keystone module - 19.2 x 14.9 port, custom:Custom - set it under Advanced - custom coupler]
 
 /* [4. Pattern] */
 // Perforation pattern for the faceplate and the switch enclosure.
@@ -45,7 +45,7 @@ mesh_pattern = "hex"; // [hex:Honeycomb, circles:Circles, squares:Squares, diamo
 
 /* [5. What to print] */
 // Print the small test pieces before the full panel.
-output = "mount"; // [mount:Complete rack mount, keystone_coupon:Keystone snap-fit test coupon, switch_test:Switch clearance test, rack_test:Rack hole alignment test, accessories:Accessories (blank plugs and brackets)]
+output = "mount"; // [mount:Complete rack mount, keystone_coupon:Keystone snap-fit test coupon, switch_test:Switch clearance test, rack_test:Rack hole alignment test, accessories:Accessories - blank plugs and brackets]
 
 /* [Advanced: rack fit] */
 // Overall panel width. 254 mm is the 10-inch standard.
@@ -1223,6 +1223,16 @@ module placed() {
   if (orientation == "rack") rotate([0, 0, 180]) rotate([90, 0, 0]) mirror([1, 0, 0]) children();
   else mirror([1, 0, 0]) children();
 }
+
+// An unknown dropdown value would otherwise give an empty result with no reason.
+function one_of(v, list) = len([for (x = list) if (x == v) 1]) > 0;
+assert(one_of(output, ["mount", "keystone_coupon", "switch_test", "rack_test", "accessories"]),
+  str("Unknown output \"", output, "\". Use mount, keystone_coupon, switch_test, rack_test or accessories."));
+assert(one_of(keystone_preset, ["goobay_96100", "goobay_90866", "generic", "custom"]),
+  str("Unknown keystone_preset \"", keystone_preset, "\". Use goobay_96100, goobay_90866, generic or custom."));
+assert(one_of(mesh_pattern, ["hex", "circles", "squares", "diamond", "offset_diamonds", "kite", "x", "plus", "slots",
+                             "skadis", "hearts", "rounded_hearts", "heart_lattice", "trilobes", "tech", "solid"]),
+  str("Unknown mesh_pattern \"", mesh_pattern, "\"."));
 
 echo(str("Panel ", PW, " x ", fmt(PH), " x ", T, " mm (", rack_units, "U)  |  enclosure ", fmt(OW), " x ", fmt(OH),
          " mm, depth ", fmt(Z_END), " mm  |  keystones ", N_KS, " (", keystone_preset, ")"));
