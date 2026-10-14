@@ -16,12 +16,12 @@ The customizer opens with five groups. Most people never need anything else:
 | 4 | **Pattern** | one of 15 patterns, or solid |
 | 5 | **What to print** | the full mount, or a test piece |
 
-The ventilated enclosure around the switch (the "shelf all around") sizes itself from the switch dimensions, with 0.3 mm of clearance on every side. Everything else (clearances, retention style, coupler rows and placement, pattern details, rack fit, colours, split printing) is in the **Advanced** groups further down, with sensible defaults. When something doesn't fit, the model stops and tells you why and what to change. It never quietly shrinks an opening.
+The ventilated enclosure around the switch (the "shelf all around") sizes itself from the switch dimensions, with 0.3 mm of clearance on every side. Its top, shelf and side walls are patterned. Everything else (clearances, retention style, coupler rows and placement, pattern details, rack fit, colours, split printing) is in the **Advanced** groups further down, with sensible defaults. When something doesn't fit, the model stops and tells you why and what to change. It never quietly shrinks an opening.
 
 | | |
 |---|---|
 | ![rear](images/rear.png) | ![2U, 4+4 couplers, diamond pattern](images/2u_diamond.png) |
-| Snap clips hold the switch from behind; patterned top and shelf | 2U, 2×2 couplers each side, diamond pattern |
+| Snap clips hold the switch from behind; patterned top, shelf and sides | 2U, 2×2 couplers each side, diamond pattern |
 | ![coupler holders from behind](images/rear_ks.png) | ![multicolor hearts with backing](images/multicolor.png) |
 | Coupler holders from behind: tunnel, latch and hook windows, cradle | Multicolor: frame, pattern and backing colours |
 
@@ -74,7 +74,7 @@ These are the same 15 patterns as the KWS Customizable generators, plus solid: h
 
 KWS's *Original* pattern and the fan, insert and cable-routing options belong to the base deck, so they have no equivalent on a switch panel.
 
-The pattern fills the faceplate around the switch and couplers and the top and bottom of the enclosure. Extra options here: clip cells at the borders or keep only whole cells; a symmetric, switch-centred or left-anchored layout; separate borders around the switch, the couplers and the panel edge. On the enclosure, which prints standing up, the openings stay self-supporting: honeycomb is flat-topped, circles become teardrops, slots get pointed tops, and rotation is not applied there.
+The pattern fills the faceplate around the switch and couplers, and the top, bottom and sides of the enclosure. Extra options here: clip cells at the borders or keep only whole cells; a symmetric, switch-centred or left-anchored layout; separate borders around the switch, the couplers and the panel edge. On the enclosure, which prints standing up, the openings stay self-supporting: honeycomb is flat-topped, circles become teardrops, slots get pointed tops, and rotation is not applied there.
 
 **Multicolor:** download the result as **3MF** to keep the colours, then map them to filament slots in your slicer. The colour change only happens in the first few millimetres (the faceplate), so there is little purge waste. **Backing** closes the faceplate pattern from behind for a two-tone look. It blocks airflow through the faceplate; the enclosure still vents.
 
@@ -87,6 +87,14 @@ The pattern fills the faceplate around the switch and couplers and the top and b
 | `switch_depth` | Front face to rear face, ignoring connectors and cables |
 
 The defaults (100 × 28 × 100) are placeholders. If the switch clearance ring (`output = switch_test`) is tight, raise `clearance_width` / `clearance_height`.
+
+## Enclosure sides
+
+![side wall options](images/sides.png)
+
+Most small switches vent through their sides, so by default the enclosure's side walls carry the pattern too (`cage_sides = mesh`). For the most airflow, `open` cuts one large window into each side wall. Its rear end comes to a 45° point, so it still prints without supports. `solid` closes them.
+
+Either way, the wall stays solid where it does a job: around the snap-clip tongues, under the crush ribs and at the screw bosses. It also stays solid along the edges and next to the panel. The border width is `cage_mesh_border` (4 mm by default).
 
 ## Holding the switch
 

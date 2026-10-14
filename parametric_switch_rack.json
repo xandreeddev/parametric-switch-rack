@@ -13,6 +13,13 @@
             "keystones_left": "1",
             "keystones_right": "0"
         },
+        "1U - open enclosure sides": {
+            "output": "mount",
+            "rack_units": "1",
+            "cage_sides": "open",
+            "keystones_left": "1",
+            "keystones_right": "0"
+        },
         "1U - front loading, friction + rear stop (reference style)": {
             "output": "mount",
             "rack_units": "1",

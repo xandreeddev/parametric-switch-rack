@@ -132,9 +132,11 @@ cage_wall = 2.4; // [1.6:0.1:5]
 cage_top = "full"; // [full:Full top, lips:Side lips only, none:Open]
 // Bottom of the enclosure (the shelf).
 cage_bottom = "full"; // [full:Full shelf, lips:Side lips only]
+// Side walls of the enclosure. Patterned or open lets air reach the switch's own side vents.
+cage_sides = "mesh"; // [mesh:Patterned, open:Open window, solid:Solid]
 // Lip width when top or bottom is set to lips.
 lip_width = 8; // [3:0.5:40]
-// Use the pattern on the enclosure top and bottom (ventilation).
+// Use the pattern on the enclosure (top, bottom, and sides when cage_sides = mesh).
 cage_mesh = true;
 // Solid border kept around the enclosure pattern.
 cage_mesh_border = 4; // [2:0.5:20]
@@ -484,6 +486,11 @@ HOOK_FLAT = 0.8;
 HOOK_RAMP = HOOK_D / tan(clip_ramp_angle);
 CLIP_H = min(clip_height, EH - 2 * WALL);
 CLIP_T = min(clip_thickness, WALL);
+
+RIB_P = CW + crush_rib_interference;   // crush rib protrusion into the switch space
+RIB_R = max(1.0, RIB_P);
+RIB_YS = let(lo = EY - EH / 2 + VS + 3, hi = EY + EH / 2 - 3)
+         [for (i = [0:crush_rib_count - 1]) lo + (i + 0.5) * (hi - lo) / crush_rib_count];
 
 BOSS = max(bracket_pilot_diameter + 4, 6.5);
 BOSS_LEN = 12;
@@ -837,6 +844,35 @@ module cage_mesh_2d(z_end, side) {
   if (v1 - v0 > 2 * h[1] && u > h[0]) mesh_field([-u, u, v0, v1], [0, v0 + h[1]], [], true);
 }
 
+// Solid areas of a side wall, in plate coordinates (u = y - EY, v = z): the snap-clip
+// tongues, the crush ribs and the bracket bosses keep their wall.
+function side_keep(m) = concat(
+  retention == "clips" ? [[-CLIP_H / 2 - 0.8 - m, CLIP_H / 2 + 0.8 + m, CLIP_Z0 - m, BIG]] : [],
+  retention == "screw" ? [[-BOSS / 2 - m, BOSS / 2 + m, Z_END - BOSS_LEN - BOSS_OUT - m, BIG]] : [],
+  retention == "friction" ? [for (y = RIB_YS) [y - EY - RIB_R - m / 2, y - EY + RIB_R + m / 2, -BIG, BIG]] : []);
+
+// Side-wall openings, plate coordinates. The walls print standing up like the top and
+// bottom: pattern cells are print-safe, and the open window ends in a 45-degree point at
+// the rear instead of a bridge.
+module cage_side_cut_2d(z_end, side) {
+  m = cage_mesh_border;
+  v0 = Z_BACK + max(m, 2 * (side > 0 ? G_R : G_L) + 1);
+  v1 = z_end - m;
+  u = EH / 2 - m;
+  keep = side_keep(m);
+  if (cage_sides == "mesh" && CAGE_MESH) {
+    h = pat_half(true);
+    if (v1 - v0 > 2 * h[1] && u > h[0]) mesh_field([-u, u, v0, v1], [0, v0 + h[1]], keep, true);
+  } else if (cage_sides == "open") {
+    vt = min(concat([v1], [for (k = keep) if (k[2] > -BIG / 2) k[2]]));   // stop before clips/bosses
+    if (u > 2 && vt - v0 > u + 2)
+      difference() {
+        polygon([[-u, v0], [u, v0], [u, vt - u], [0, vt], [-u, vt - u]]);
+        for (k = keep) if (k[2] <= -BIG / 2) rect(k);                    // crush rib strips
+      }
+  }
+}
+
 // ============================================================================
 // Faceplate
 // ============================================================================
@@ -939,15 +975,11 @@ module clip_hooks() {
 }
 
 module crush_ribs() {
-  p = CW + crush_rib_interference;
-  r = max(1.0, p);
+  p = RIB_P;
+  r = RIB_R;
   z0 = Z_BACK + 1;
   z1 = Z_END - 0.5;
-  lo = EY - EH / 2 + VS + 3;
-  hi = EY + EH / 2 - 3;
-  n = crush_rib_count;
-  for (s = [-1, 1]) for (i = [0:n - 1]) {
-    y = lo + (i + 0.5) * (hi - lo) / n;
+  for (s = [-1, 1]) for (y = RIB_YS) {
     xf = EX + s * (EW / 2 + r - p);   // full protrusion
     x0 = EX + s * (EW / 2 + r);       // flush with the wall
     if (REAR_LOAD)   // lead-in at the rear, where the switch enters
@@ -1023,6 +1055,8 @@ module cage_3d(z_end, features) {
     }
     if (features && retention == "clips") clip_cuts();
     if (features && retention == "screw") boss_holes();
+    if (features && cage_sides != "solid") for (s = [-1, 1])
+      yz_plate(EX + s * (EW / 2 + WALL / 2) - WALL / 2 - 1, WALL + 2) translate([EY, 0]) cage_side_cut_2d(z_end, s);
   }
 }
 
@@ -1230,6 +1264,7 @@ assert(one_of(output, ["mount", "keystone_coupon", "switch_test", "rack_test", "
   str("Unknown output \"", output, "\". Use mount, keystone_coupon, switch_test, rack_test or accessories."));
 assert(one_of(keystone_preset, ["goobay_96100", "goobay_90866", "generic", "custom"]),
   str("Unknown keystone_preset \"", keystone_preset, "\". Use goobay_96100, goobay_90866, generic or custom."));
+assert(one_of(cage_sides, ["mesh", "open", "solid"]), str("Unknown cage_sides \"", cage_sides, "\". Use mesh, open or solid."));
 assert(one_of(mesh_pattern, ["hex", "circles", "squares", "diamond", "offset_diamonds", "kite", "x", "plus", "slots",
                              "skadis", "hearts", "rounded_hearts", "heart_lattice", "trilobes", "tech", "solid"]),
   str("Unknown mesh_pattern \"", mesh_pattern, "\"."));
